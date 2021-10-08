@@ -1,0 +1,32 @@
+version: 1
+send_anonymous_usage_stats: true
+project_id: cb094cec-d74a-4a8b-a868-ce214fda75be
+plugins:
+  extractors:
+  - name: tap-rest-api
+    namespace: tap_rest_api
+    pip_url: git+https://github.com/Widen/tap-rest-api.git
+    executable: tap-rest-api
+    capabilities:
+    - state
+    - catalog
+    - discover
+    config:
+      api_url: https://earthquake.usgs.gov/fdsnws
+      streams_config:
+        - name: us_earthquakes
+          path: /event/1/query
+          params:
+            format: geojson
+            starttime: "2014-01-01"
+            endtime: "2014-01-02"
+            minmagnitude: 1
+          primary_keys:
+            - id
+          records_path: "$.features[*]"
+    select:
+      - '*.*'
+  loaders:
+  - name: target-jsonl
+    variant: andyh1203
+    pip_url: target-jsonl
